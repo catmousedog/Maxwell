@@ -30,3 +30,21 @@
 *.exe
 *.out
 *.app
+
+# CMake files
+build/*
+
+# not Makefiles
+# !build/Makefile
+
+# !build/relativity
+# build/relativity/*
+# !build/relativity/Makefile
+
+# !build/tests
+# build/tests/*
+# !build/tests/Makefile
+
+# !build/bindings
+# build/bindings/*
+# !build/bindings/Makefile

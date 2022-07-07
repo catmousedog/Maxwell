@@ -1,0 +1,100 @@
+{
+	"tasks": [
+		{
+			"label": "cmake (debug)",
+			"type": "shell",
+			"command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder}/cpp -DCMAKE_BUILD_TYPE=Debug",
+			"group": "build",
+			"problemMatcher": {
+				"base": "$gcc"
+			},
+			"detail": "build cmake files (debug)"
+		},
+		{
+			"label": "cmake (release)",
+			"type": "shell",
+			"command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder}/cpp -DCMAKE_BUILD_TYPE=Release",
+			"group": "build",
+			"problemMatcher": {
+				"base": "$gcc"
+			},
+			"detail": "build cmake files (release)"
+		},
+		{
+			"label": "clean build files",
+			"type": "shell",
+			"command": "rm -rf *",
+			"group": "build",
+			"options": {
+				"cwd": "${workspaceFolder}/build" //remove inside build dir
+			},
+			"detail": "cleans the cmake build files"
+		},
+		{
+			"label": "build module",
+			"type": "shell",
+			"command": "make module",
+			"group": "build",
+			"options": {
+				"cwd": "${workspaceFolder}/build"
+			},
+			"problemMatcher": {
+				"base": "$gcc"
+			},
+			"detail": "build the pybind11 relativity module"
+		},
+		{
+			"label": "run main.py (+ build)",
+			"type": "shell",
+			"command": "python3",
+			"args": [
+				"main.py"
+			],
+			"dependsOn": "build module",
+			"group": "build",
+			"options": {
+				"cwd": "${workspaceFolder}/python"
+			},
+			"detail": "build the pybind11 relativity module and run the main.py"
+		},
+		{
+			"label": "build relativity",
+			"type": "shell",
+			"command": "make relativity",
+			"group": "build",
+			"options": {
+				"cwd": "${workspaceFolder}/build"
+			},
+			"problemMatcher": {
+				"base": "$gcc"
+			},
+			"detail": "compile the C++ relativity library"
+		},
+		{
+			"label": "build tests",
+			"type": "shell",
+			"command": "make tests",
+			"group": "build",
+			"dependsOn": "build relativity",
+			"options": {
+				"cwd": "${workspaceFolder}/build"
+			},
+			"problemMatcher": {
+				"base": "$gcc"
+			},
+			"detail": "compile the tests"
+		},
+		{
+			"label": "run tests (+ build)",
+			"type": "shell",
+			"command": "${workspaceFolder}/build/tests/tests.exe",
+			"dependsOn": "build tests",
+			"group": "build",
+			"problemMatcher": {
+				"base": "$gcc"
+			},
+			"detail": "compile and run the tests"
+		},
+	],
+	"version": "2.0.0"
+}
