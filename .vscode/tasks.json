@@ -3,7 +3,7 @@
 		{
 			"label": "cmake (debug)",
 			"type": "shell",
-			"command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder}/cpp -DCMAKE_BUILD_TYPE=Debug",
+			"command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder} -DCMAKE_BUILD_TYPE=Debug",
 			"group": "build",
 			"problemMatcher": {
 				"base": "$gcc"
@@ -13,7 +13,7 @@
 		{
 			"label": "cmake (release)",
 			"type": "shell",
-			"command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder}/cpp -DCMAKE_BUILD_TYPE=Release",
+			"command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder} -DCMAKE_BUILD_TYPE=Release",
 			"group": "build",
 			"problemMatcher": {
 				"base": "$gcc"
@@ -23,17 +23,17 @@
 		{
 			"label": "clean build files",
 			"type": "shell",
-			"command": "rm -rf *",
+			"command": "rm -r build/*",
 			"group": "build",
 			"options": {
-				"cwd": "${workspaceFolder}/build" //remove inside build dir
+				"cwd": "${workspaceFolder}" //remove inside build dir
 			},
 			"detail": "cleans the cmake build files"
 		},
 		{
-			"label": "build module",
+			"label": "build relatpy",
 			"type": "shell",
-			"command": "make module",
+			"command": "make relatpy",
 			"group": "build",
 			"options": {
 				"cwd": "${workspaceFolder}/build"
@@ -41,7 +41,7 @@
 			"problemMatcher": {
 				"base": "$gcc"
 			},
-			"detail": "build the pybind11 relativity module"
+			"detail": "build the 'relatpy' pybind11 relativity module"
 		},
 		{
 			"label": "run main.py (+ build)",
@@ -50,7 +50,7 @@
 			"args": [
 				"main.py"
 			],
-			"dependsOn": "build module",
+			"dependsOn": "build relatpy",
 			"group": "build",
 			"options": {
 				"cwd": "${workspaceFolder}/python"
