@@ -1,19 +1,17 @@
 #define CATCH_CONFIG_MAIN
 
-#include <vector>
+#include <catch2/catch.hpp>
 
-#include <catch.hpp>
-
-#include "../relativity/include/Event.h"
+#include "../relativity/include/vec.hpp"
 
 TEST_CASE("3 VEC")
 {
     SECTION("constructor")
     {
-        Position position(1.0, 2.0, 3.0);
+        vec3 v(1.0, 2.0, 3.0);
 
-        REQUIRE(position.t == (decimal)1.0);
-        REQUIRE(position.x == (decimal)2.0);
-        REQUIRE(position.y == (decimal)3.0);
+        REQUIRE(v.t == (scalar)1.0);
+        REQUIRE(v.x == (scalar)2.0);
+        REQUIRE(v.y == (scalar)3.0);
     }
 }

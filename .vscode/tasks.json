@@ -87,7 +87,7 @@
 		{
 			"label": "run tests (+ build)",
 			"type": "shell",
-			"command": "${workspaceFolder}/build/tests/tests.exe",
+			"command": "${workspaceFolder}/build/source/tests/tests.exe",
 			"dependsOn": "build tests",
 			"group": "build",
 			"problemMatcher": {
