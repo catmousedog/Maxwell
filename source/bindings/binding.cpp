@@ -1,6 +1,8 @@
 #include <pybind11/pybind11.h>
 
-#include "../relativity/include/vec.h"
+#include "../relativity/include/vec.hpp"
+#include "../relativity/include/worldline.hpp"
+#include "../relativity/include/pointworldline.hpp"
 
 namespace py = pybind11;
 
@@ -21,4 +23,13 @@ PYBIND11_MODULE(relatpy, m)
         .def_readwrite("t", &vec3::t)
         .def_readwrite("x", &vec3::x)
         .def_readwrite("y", &vec3::y);
+
+    py::class_<Frame>(m, "Frame")
+        .def(py::init<>());
+
+    py::class_<Worldline>(m, "Worldline");
+
+    py::class_<PointWorldline>(m, "PointWorldline")
+        .def(py::init<Frame>())
+        .def("integrate", &PointWorldline::integrate);
 }
