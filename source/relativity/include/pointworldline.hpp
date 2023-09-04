@@ -7,5 +7,5 @@ class PointWorldline : public Worldline
 public:
     using Worldline::Worldline;
 
-    vec3 event_at_ptime(const scalar pt) const override;
+    vec3 event_at_ptime() const override;
 };

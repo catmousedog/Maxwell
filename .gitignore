@@ -44,6 +44,11 @@ __pycache__
 *.md
 temp/
 
+# vscode
+*.json
+!tasks.json
+!launch.json
+
 # CMake files
 build/*
 
