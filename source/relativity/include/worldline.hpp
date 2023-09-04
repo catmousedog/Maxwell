@@ -23,18 +23,9 @@ public:
 protected:
     const Frame &mainframe;
 
-    /**
-     * @brief The current event for the mainframe in the main frame.
-     */
-    vec3 mcurrent;
 
-    /**
-     * @brief The current event for the mainframe in the object starting frame.
-     */
-    vec3 pcurrent;
-
-    // const std::deque<vec3> wordline_cache;
-    // add some sort of cache list in so integrate can save the cached events along the worldline
+    // const std::deque<vec3> wordline_cache; add some sort of cache list in so integrate can save
+    // the cached events along the worldline
 
     scalar ptime = 0;
 
@@ -42,17 +33,26 @@ public:
     Worldline(const Frame &mainframe);
 
     /**
-     * @brief Get the event at the mainframe time mt.
+     * @brief Update the current events after a timestep dt in the mainframe.
      *
      * @param t main frame time
      * @return vec3
      */
-    void update_current_mtime_step(const scalar dmt);
+    void mtime_step(const scalar dmt);
 
     /**
      * @brief Get the event at the worldline's proper time pt.
      *
+     * @param pt proper time
      * @return vec3
      */
-    virtual vec3 event_at_ptime() const = 0;
+    virtual vec3 event_at_ptime(const scalar pt) const = 0;
+
+    /**
+     * @brief Velocity at the wordline's proper time pt.
+     *
+     * @param pt proper time
+     * @return vel2
+     */
+    virtual vel2 vel_at_ptime(const scalar pt) const = 0;
 };

@@ -24,12 +24,17 @@ public:
     {
         set(x, y);
     }
+    vel2(const vec2 &vec) : vec2(vec.x, vec.y)
+    {
+        set(x, y);
+    }
 
     inline scalar vx() const { return x; }
     inline scalar vy() const { return y; }
     inline scalar mag() const { return _mag; }
     inline scalar gamma() const { return _gamma; }
     inline scalar igamma() const { return _igamma; }
+    inline vec2 dir() const { return _dir; }
 
     inline vel2 &operator=(const vel2 &vel)
     {
@@ -49,13 +54,13 @@ public:
     }
 
     /**
-     * @brief Relativistic velocity addition. The first velocity is the original velocity in the
-     * 'rest' frame, the second velocity is the velocity of the boost.
+     * @brief Non-commutative relativistic velocity addition. The first velocity is the original
+     * velocity in the 'rest' frame, the second velocity is the velocity of the boost.
      *
      * @param u the boost velocity
      * @return vel2&
      */
-    inline vel2 &operator+=(const vel2 &u)
+    inline vel2 &boost(const vel2 &u)
     {
         vel2 &v = *this;
         // parallel
@@ -64,7 +69,7 @@ public:
         scalar bv_par = (v_par + u._mag) * g;
 
         // perp
-        vec2 v_per = v - u._dir * v_par; // not a vel since we just need mag()
+        vec2 v_per = static_cast<vec2 &>(v) - u._dir * v_par; // not a vel since we just need mag()
         vec2 bv_per = v_per * u._igamma * g;
 
         *this = u._dir * bv_par + bv_per;
@@ -79,10 +84,10 @@ public:
      * @param u the boost velocity
      * @return vel2
      */
-    inline vel2 operator+(const vel2 &u)
+    inline vel2 boosted(const vel2 &u)
     {
         vel2 v = *this;
-        return v += u;
+        return v.boost(u);
     }
 
 private:
@@ -102,4 +107,6 @@ private:
         os << vel.x << ", " << vel.y;
         return os;
     }
+
+    friend class vec3;
 };

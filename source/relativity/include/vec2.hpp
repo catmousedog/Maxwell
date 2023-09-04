@@ -21,17 +21,20 @@ struct vec2
 
     inline vec2 &normalise()
     {
-        return *this /= mag();
+        scalar _mag = mag();
+        if (_mag != 0)
+            *this /= _mag;
+        return *this;
     }
 
-    vec2 &operator+=(const vec2 &u)
+    inline vec2 &operator+=(const vec2 &u)
     {
         x += u.x;
         y += u.y;
         return *this;
     }
 
-    vec2 &operator-=(const vec2 &u)
+    inline vec2 &operator-=(const vec2 &u)
     {
         x -= u.x;
         y -= u.y;
@@ -50,25 +53,25 @@ struct vec2
         return *this *= (1 / a);
     }
 
-    vec2 operator+(const vec2 &u) const
+    inline vec2 operator+(const vec2 &u) const
     {
         vec2 v = *this;
         return v += u;
     }
 
-    vec2 operator-(const vec2 &u) const
+    inline vec2 operator-(const vec2 &u) const
     {
         vec2 v = *this;
         return v -= u;
     }
 
-    vec2 operator*(const scalar a) const
+    inline vec2 operator*(const scalar a) const
     {
         vec2 u = *this;
         return u *= a;
     }
 
-    vec2 operator/(const scalar a) const
+    inline vec2 operator/(const scalar a) const
     {
         vec2 u = *this;
         return u /= a;

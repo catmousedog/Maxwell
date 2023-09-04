@@ -2,7 +2,12 @@
 
 #include <math.h>
 
-vec3 PointWorldline::event_at_ptime() const
+vec3 PointWorldline::event_at_ptime(const scalar pt) const
 {
-    return vec3(ptime, sin(0.5 * ptime), 0);
+    return vec3(pt, sin(0.5 * pt), 0);
+}
+
+vel2 PointWorldline::vel_at_ptime(const scalar pt) const
+{
+    return vel2(0, 0.5 * cos(0.5 * pt));
 }

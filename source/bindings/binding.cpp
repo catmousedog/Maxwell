@@ -28,23 +28,28 @@ PYBIND11_MODULE(relatpy, m)
         .def("igamma", &vel2::igamma)
         .def("vx", &vel2::vx)
         .def("vy", &vel2::vy)
-        .def(py::self += py::self);
+        .def("boost_vel", &vel2::boost)
+        .def("boosted_vel", &vel2::boosted);
 
     py::class_<vec3>(m, "vec3")
         .def(py::init<>())
         .def(py::init<scalar, scalar, scalar>())
         .def_readwrite("t", &vec3::t)
         .def_readwrite("x", &vec3::x)
-        .def_readwrite("y", &vec3::y);
+        .def_readwrite("y", &vec3::y)
+        .def("boost_vec", &vec3::boost)
+        .def("boosted_vec", &vec3::boosted);
 
     py::class_<Frame>(m, "Frame")
         .def(py::init<>());
 
     py::class_<Worldline>(m, "Worldline")
-        .def_readwrite("vel", &Worldline::vel);
+        .def_readwrite("vel", &Worldline::vel)
+        .def("mtime_step", &Worldline::mtime_step);
 
     py::class_<PointWorldline>(m, "PointWorldline")
         .def(py::init<Frame>())
         .def_readwrite("vel", &Worldline::vel)
-        .def("event_at_ptime", &PointWorldline::event_at_ptime);
+        .def("event_at_ptime", &PointWorldline::event_at_ptime)
+        .def("vel_at_ptime", &PointWorldline::vel_at_ptime);
 }

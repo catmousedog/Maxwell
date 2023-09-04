@@ -19,16 +19,33 @@ struct vec3
     vec3() : t(0), x(0), y(0) {}
     vec3(scalar t, scalar x, scalar y) : t(t), x(x), y(y) {}
 
-    void boost(const vel2 &v)
+    inline vec3 &boost(const vel2 &u)
     {
         scalar old_t = t;
 
-        // just vx for now
-        t = v.gamma() * (old_t - v.mag() * x);
-        x = v.gamma() * (x - v.mag() * old_t);
+        // parallel
+        scalar r_par = u._dir.x * x + u._dir.y * y;
+
+        // perp
+        vec2 r_per(x - u._dir.x * r_par, y - u._dir.y * r_par);
+
+        t = u.gamma() * (old_t + u.mag() * r_par);
+        scalar br_par = u.gamma() * (r_par + u.mag() * old_t);
+
+        vec2 boosted = u._dir * br_par + r_per;
+        x = boosted.x;
+        y = boosted.y;
+
+        return *this;
     }
 
-    vec3 &operator+=(const vec3 &u)
+    inline vec3 boosted(const vel2 &u)
+    {
+        vec3 v = *this;
+        return v.boost(u);
+    }
+
+    inline vec3 &operator+=(const vec3 &u)
     {
         t += u.t;
         x += u.x;
@@ -36,7 +53,7 @@ struct vec3
         return *this;
     }
 
-    vec3 &operator-=(const vec3 &u)
+    inline vec3 &operator-=(const vec3 &u)
     {
         t -= u.t;
         x -= u.x;
@@ -44,13 +61,13 @@ struct vec3
         return *this;
     }
 
-    vec3 operator+(const vec3 &u) const
+    inline vec3 operator+(const vec3 &u) const
     {
         vec3 v = *this;
         return v += u;
     }
 
-    vec3 operator-(const vec3 &u) const
+    inline vec3 operator-(const vec3 &u) const
     {
         vec3 v = *this;
         return v -= u;
@@ -63,10 +80,15 @@ struct vec3
      * @param u
      * @return scalar
      */
-    scalar operator*(const vec3 &u) const
+    inline scalar operator*(const vec3 &u) const
     {
         return t * u.t - x * u.x - y * u.y;
     }
 
     // 2nd ground form
+
+    inline bool operator==(const vec3 &u) const
+    {
+        return x == u.x && y == u.y;
+    }
 };
