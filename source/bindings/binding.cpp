@@ -6,6 +6,7 @@
 #include "../relativity/include/vec3.hpp"
 #include "../relativity/include/worldline.hpp"
 #include "../relativity/include/pointworldline.hpp"
+#include "../relativity/include/integrator.hpp"
 
 namespace py = pybind11;
 
@@ -44,12 +45,24 @@ PYBIND11_MODULE(relatpy, m)
         .def(py::init<>());
 
     py::class_<Worldline>(m, "Worldline")
+        .def_readwrite("ptime", &Worldline::ptime)
         .def_readwrite("vel", &Worldline::vel)
-        .def("mtime_step", &Worldline::mtime_step);
+        .def_readwrite("current", &Worldline::current)
+        .def("dt_step", &Worldline::dt_step)
+        .def("dv_step", &Worldline::dv_step);
 
     py::class_<PointWorldline>(m, "PointWorldline")
-        .def(py::init<Frame>())
+        .def(py::init<Frame, const vec2>())
+        .def_readwrite("ptime", &Worldline::ptime)
         .def_readwrite("vel", &Worldline::vel)
+        .def_readwrite("current", &Worldline::current)
         .def("event_at_ptime", &PointWorldline::event_at_ptime)
-        .def("vel_at_ptime", &PointWorldline::vel_at_ptime);
+        .def("vel_at_ptime", &PointWorldline::vel_at_ptime)
+        .def("dt_step", &Worldline::dt_step)
+        .def("dv_step", &Worldline::dv_step);
+
+    py::class_<Integrator>(m, "Integrator")
+        .def(py::init<Frame>())
+        .def("add_worldline", &Integrator::add_worldline)
+        .def("step", &Integrator::step);
 }
