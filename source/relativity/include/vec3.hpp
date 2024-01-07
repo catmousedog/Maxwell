@@ -19,7 +19,7 @@ struct vec3
     vec3() : t(0), x(0), y(0) {}
     vec3(scalar t, scalar x, scalar y) : t(t), x(x), y(y) {}
 
-    inline vec3 &boost(const vel2 &u)
+    inline vec3& boost(const vel2& u)
     {
         scalar old_t = t;
 
@@ -39,13 +39,13 @@ struct vec3
         return *this;
     }
 
-    inline vec3 boosted(const vel2 &u)
+    inline vec3 boosted(const vel2& u)
     {
         vec3 v = *this;
         return v.boost(u);
     }
 
-    inline vec3 &operator+=(const vec3 &u)
+    inline vec3& operator+=(const vec3& u)
     {
         t += u.t;
         x += u.x;
@@ -53,7 +53,7 @@ struct vec3
         return *this;
     }
 
-    inline vec3 &operator-=(const vec3 &u)
+    inline vec3& operator-=(const vec3& u)
     {
         t -= u.t;
         x -= u.x;
@@ -61,13 +61,13 @@ struct vec3
         return *this;
     }
 
-    inline vec3 operator+(const vec3 &u) const
+    inline vec3 operator+(const vec3& u) const
     {
         vec3 v = *this;
         return v += u;
     }
 
-    inline vec3 operator-(const vec3 &u) const
+    inline vec3 operator-(const vec3& u) const
     {
         vec3 v = *this;
         return v -= u;
@@ -80,15 +80,9 @@ struct vec3
      * @param u
      * @return scalar
      */
-    inline scalar operator*(const vec3 &u) const
-    {
-        return t * u.t - x * u.x - y * u.y;
-    }
+    inline scalar operator*(const vec3& u) const { return t * u.t - x * u.x - y * u.y; }
 
     // 2nd ground form
 
-    inline bool operator==(const vec3 &u) const
-    {
-        return x == u.x && y == u.y;
-    }
+    inline bool operator==(const vec3& u) const { return x == u.x && y == u.y; }
 };

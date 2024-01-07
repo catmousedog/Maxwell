@@ -1,24 +1,22 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-
-#include "worldline.hpp"
-#include "pointworldline.hpp"
+#include "point.hpp"
 #include "vec2.hpp"
-#include "vel2.hpp"
 #include "vec3.hpp"
+#include "vel2.hpp"
+#include <memory>
+#include <vector>
 
 class Integrator
 {
-    const Frame &mainframe;
+    const Frame& mainframe;
 
-    std::vector<std::unique_ptr<Worldline>> objects;
+    std::vector<Point*> objects;
 
 public:
-    Integrator(const Frame &mainframe);
+    Integrator(const Frame& mainframe);
 
-    void add_worldline(const vec2 offset);
+    void addPoint(Point* p);
 
     void step(const scalar dt);
 };

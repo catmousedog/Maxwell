@@ -1,12 +1,11 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/operators.h>
-
-#include "../relativity/include/vec2.hpp"
-#include "../relativity/include/vel2.hpp"
-#include "../relativity/include/vec3.hpp"
-#include "../relativity/include/worldline.hpp"
-#include "../relativity/include/pointworldline.hpp"
+#include "../relativity/include/body.hpp"
 #include "../relativity/include/integrator.hpp"
+#include "../relativity/include/point.hpp"
+#include "../relativity/include/vec2.hpp"
+#include "../relativity/include/vec3.hpp"
+#include "../relativity/include/vel2.hpp"
+#include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
@@ -23,7 +22,7 @@ PYBIND11_MODULE(relatpy, m)
     py::class_<vel2, vec2>(m, "vel2")
         .def(py::init<>())
         .def(py::init<scalar, scalar>())
-        .def(py::init<const vel2 &>())
+        .def(py::init<const vel2&>())
         .def("mag", &vel2::mag)
         .def("gamma", &vel2::gamma)
         .def("igamma", &vel2::igamma)
@@ -41,28 +40,25 @@ PYBIND11_MODULE(relatpy, m)
         .def("boost_vec", &vec3::boost)
         .def("boosted_vec", &vec3::boosted);
 
-    py::class_<Frame>(m, "Frame")
-        .def(py::init<>());
+    py::class_<Frame>(m, "Frame").def(py::init<>());
 
-    py::class_<Worldline>(m, "Worldline")
-        .def_readwrite("ptime", &Worldline::ptime)
-        .def_readwrite("vel", &Worldline::vel)
-        .def_readwrite("current", &Worldline::current)
-        .def("dt_step", &Worldline::dt_step)
-        .def("dv_step", &Worldline::dv_step);
+    py::class_<Point>(m, "Point")
+        .def(py::init<Frame, vec3>())
+        .def_readwrite("ptime", &Point::ptime)
+        .def_readwrite("vel", &Point::vel)
+        .def_readwrite("current", &Point::current)
+        .def("step", &Point::step);
 
-    py::class_<PointWorldline>(m, "PointWorldline")
-        .def(py::init<Frame, const vec2>())
-        .def_readwrite("ptime", &Worldline::ptime)
-        .def_readwrite("vel", &Worldline::vel)
-        .def_readwrite("current", &Worldline::current)
-        .def("event_at_ptime", &PointWorldline::event_at_ptime)
-        .def("vel_at_ptime", &PointWorldline::vel_at_ptime)
-        .def("dt_step", &Worldline::dt_step)
-        .def("dv_step", &Worldline::dv_step);
+    py::class_<Body, Point>(m, "Body")
+        .def(py::init<Frame, vec3>())
+        .def_readwrite("ptime", &Point::ptime)
+        .def_readwrite("vel", &Point::vel)
+        .def_readwrite("current", &Point::current)
+        .def("addPoint", &Body::addPoint)
+        .def("step", &Body::step);
 
     py::class_<Integrator>(m, "Integrator")
         .def(py::init<Frame>())
-        .def("add_worldline", &Integrator::add_worldline)
+        .def("addPoint", &Integrator::addPoint)
         .def("step", &Integrator::step);
 }

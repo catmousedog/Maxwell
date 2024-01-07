@@ -1,22 +1,18 @@
 #include "../include/integrator.hpp"
 
-Integrator::Integrator(const Frame &mainframe) : mainframe(mainframe)
-{
-}
+Integrator::Integrator(const Frame& mainframe) : mainframe(mainframe) {}
 
-void Integrator::add_worldline(const vec2 offset)
+void Integrator::addPoint(Point* p)
 {
-    PointWorldline *pwl = new PointWorldline(mainframe, offset);
-    objects.push_back(std::unique_ptr<Worldline>(pwl));
+    objects.push_back(p);
 }
 
 void Integrator::step(const scalar dt)
 {
     vel2 dv(0.01, 0);
-    for (std::unique_ptr<Worldline> &ptr : objects)
+    for (Point* p : objects)
     {
-        Worldline &wl = *ptr.get();
-        wl.dt_step(dt);
-        wl.vel.boost(-dv);
+        p->step(dt);
+        // wl->vel.boost(-dv);
     }
 }
