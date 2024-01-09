@@ -1,15 +1,14 @@
 #include "../include/point.hpp"
+#include <iostream>
 
 Point::Point(const Frame& mainframe) : mainframe(mainframe) {}
 
-Point::Point(const Frame& mainframe, const vec3& current) : mainframe(mainframe), current(current) {}
+Point::Point(const Frame& mainframe, const vec3& event) : vec3(event), mainframe(mainframe) {}
 
 void Point::step(scalar dmt)
 {
-    // in reality this will have to be a converging process because this is only true for a straight
-    // world line, so an iterative process is needed to find the right dpt such that it is at t+dmt
-
-    scalar dpt = dmt * vel.igamma();
+    // might have to do multiple Point steps if dpt becomes too high!
+    scalar dpt = dmt * vel.igamma;
 
     // previous
     // vel2 prev_v = vel_at_ptime(ptime);
@@ -23,14 +22,9 @@ void Point::step(scalar dmt)
 
     // simple 1st order timestep
     vec2 dl = vel * dmt;
-    current += vec3(dmt, dl.x, dl.y);
+    *this += vec3(dmt, dl.x, dl.y);
 
     // change velocity of this object somehow
     vel2 dv(accel * dpt);
     vel.boost(dv);
-}
-
-vec2 Point::getPos() const
-{
-    return vec2(current.x, current.y);
 }

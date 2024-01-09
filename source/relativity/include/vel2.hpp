@@ -5,39 +5,30 @@
 
 struct vel2 : public vec2
 {
-private:
+public:
     using vec2::x;
     using vec2::y;
 
-    scalar _mag;
-    scalar _mag2;
-    scalar _gamma;
-    scalar _igamma;
+    scalar mag;
+    scalar mag2;
+    scalar gamma;
+    scalar igamma;
 
-    vec2 _dir;
+    vec2 dir;
 
-public:
     vel2() : vec2() { set(x, y); }
     vel2(scalar vx, scalar vy) : vec2(vx, vy) { set(x, y); }
     vel2(const vec2& vec) : vec2(vec.x, vec.y) { set(x, y); }
-
-    inline scalar vx() const { return x; }
-    inline scalar vy() const { return y; }
-    inline scalar mag() const { return _mag; }
-    inline scalar mag2() const { return _mag2; }
-    inline scalar gamma() const { return _gamma; }
-    inline scalar igamma() const { return _igamma; }
-    inline vec2 dir() const { return _dir; }
 
     inline vel2& operator=(const vel2& vel)
     {
         x = vel.x;
         y = vel.y;
-        _mag = vel._mag;
-        _mag2 = vel._mag2;
-        _igamma = vel._igamma;
-        _gamma = vel._gamma;
-        _dir = vel._dir;
+        mag = vel.mag;
+        mag2 = vel.mag2;
+        igamma = vel.igamma;
+        gamma = vel.gamma;
+        dir = vel.dir;
         return *this;
     }
 
@@ -59,16 +50,16 @@ public:
         // we will boost this velocity by v
         vel2& u = *this;
 
-        scalar u_par_mag = v._dir * u;
-        scalar g = 1 / (1 + u_par_mag * v._mag);
+        scalar u_par_mag = v.dir * u;
+        scalar g = 1 / (1 + u_par_mag * v.mag);
 
         // parallel
-        vec2 u_par = u_par_mag * v._dir;
+        vec2 u_par = u_par_mag * v.dir;
         vec2 bu_par = (v + u_par) * g;
 
         // perpendicular
         vec2 u_per = u - u_par;
-        vec2 bu_per = u_per * v._igamma * g;
+        vec2 bu_per = u_per * v.igamma * g;
 
         return *this = bu_par + bu_per;
 
@@ -107,12 +98,12 @@ private:
     {
         x = vx;
         y = vy;
-        _mag = vec2::mag();
-        _mag2 = vec2::mag2();
-        _igamma = sqrt(1 - _mag2);
-        _gamma = 1 / _igamma;
-        _dir = *this;
-        _dir.normalise();
+        mag = vec2::mag();
+        mag2 = vec2::mag2();
+        igamma = sqrt(1 - mag2);
+        gamma = 1 / igamma;
+        dir = *this;
+        dir.normalise();
     }
 
     friend std::ostream& operator<<(std::ostream& os, const vel2& vel)

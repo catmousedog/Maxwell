@@ -1,6 +1,7 @@
 #pragma once
 
 #include "point.hpp"
+#include <iostream>
 #include <vector>
 
 /**
@@ -10,12 +11,20 @@
  */
 class Body : public Point
 {
-public:
+
     std::vector<Point*> points;
 
+    /**
+     * @brief Proper lengths associated with each point.
+     */
+    std::vector<vec2> proper_positions;
+
+public:
     using Point::Point;
 
-    void addPoint(Point* point);
+    void addPoint(const vec2& ppos);
 
     void step(scalar dmt) override;
+
+    std::vector<Point*> getPoints() { return points; }
 };

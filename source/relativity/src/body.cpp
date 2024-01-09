@@ -1,41 +1,46 @@
 #include "../include/body.hpp"
+#include <iostream>
 
-void Body::addPoint(Point* point)
+void Body::addPoint(const vec2& ppos)
 {
-    points.push_back(point);
+    // lorentz transform is needed here as body might be moving wrt to mainframe
+    points.push_back(new Point(mainframe, vec3(t, x + ppos.x, y + ppos.y)));
+    proper_positions.push_back(ppos);
 }
 
 // upper case for 'central' point, lower case for other point
 void Body::step(scalar dmt)
 {
-    accel = vec2(0.1, 0);
+    vec2 dir = pos().normalise();
 
-    Point::step(dmt);
+    double A_par = accel * dir;
+    vec2 A_per = accel - dir * A_par;
+    double V_par = vel * dir;
 
-    vec2 pos = getPos();
-    double D = pos.mag();
-    pos /= D;
+    // Rindler distance of central point
+    double D = 1 / A_par;
+    // D = 1 / A_par * (1 - vel.gamma) + D;
 
-    double A_par = accel * pos;
-    vec2 A_per = accel - pos * A_par;
-
-    for (Point* p : points)
+    for (size_t i = 0; i < points.size(); i++)
     {
-        // relative distance to 'central' point of this rigid body
-        vec2 rel = pos - p->getPos();
-        double d = -rel * pos;
+        Point* point = points[i];
+        const vec2& proper_pos = proper_positions[i];
 
-        if (d < -1 / abs(A_par))
+        double d = -proper_pos * dir;
+        if (d > D)
         {
             // point is outside the Rindler horizon of the central point
             // seperate this point? create new Body?
         }
+        else
+        {
+            double a_par = D / (D + d) * A_par;  // Rindler factor for constant proper length
 
-        double a_par = D / (D + d) * A_par;  // Rindler factor for constant proper length
-        // a_per = A_per
+            point->accel = dir * a_par + A_per;  // a_per = A_per
 
-        p->accel = pos * a_par + A_per;
-
-        p->step(dmt);
+            point->step(dmt);
+        }
     }
+
+    Point::step(dmt);
 }

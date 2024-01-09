@@ -1,5 +1,7 @@
+#include "../relativity/include/body.hpp"
 #include "../relativity/include/frame.hpp"
-#include "../relativity/include/pointpoint.hpp"
+#include "../relativity/include/integrator.hpp"
+#include "../relativity/include/point.hpp"
 #include "../relativity/include/vec2.hpp"
 #include "../relativity/include/vec3.hpp"
 #include "../relativity/include/vel2.hpp"
@@ -7,12 +9,31 @@
 #include <iostream>
 #include <random>
 
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<double> uniform(0.0, 1.0);
+
+double randd(double start = 0.0, double end = 1.0)
+{
+    return uniform(gen) * (end - start) + start;
+}
+
+vec2 randd2()
+{
+    double x = randd();
+    double y = sqrt(1 - x * x);
+    return vec2(x, y);
+}
+
+vec3 randd3()
+{
+    double x = randd();
+    double y = sqrt(1 - x * x);
+    return vec3(0, x, y);
+}
+
 TEST_CASE("vec")
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> uniform(0.0, 1.0);
-
     SECTION("vec3")
     {
         vec3 v(1.0, 2.0, 3.0);
@@ -36,24 +57,22 @@ TEST_CASE("vec")
         vel2 boost = vel2(0.99, 0);
         vel2 bv = v.boosted(boost);
 
-        REQUIRE(bv.vx() == Approx(0.99));
-        REQUIRE(bv.vy() == Approx(0.99 * v.igamma()));
-        REQUIRE(bv.mag() == Approx(0.999801975393));
+        REQUIRE(bv.x == Approx(0.99));
+        REQUIRE(bv.y == Approx(0.99 * v.igamma));
+        REQUIRE(bv.mag == Approx(0.999801975393));
 
         // boost with itself should be v_new = 2v / (1+v²)
-        double vx = uniform(gen);
-        double vy = sqrt(1 - vx * vx);
-        v = vel2(vx * 0.5, vy * 0.5);
+        v = vel2(0.5 * randd2());
         bv = v.boosted(v);
-        double g = 1 / (1 + v.mag2());
+        double g = 1 / (1 + v.mag2);
 
         // same direction
-        REQUIRE(v.dir().x == Approx(bv.dir().x));
-        REQUIRE(v.dir().y == Approx(bv.dir().y));
+        REQUIRE(v.dir.x == Approx(bv.dir.x));
+        REQUIRE(v.dir.y == Approx(bv.dir.y));
 
-        REQUIRE(bv.vx() == Approx(2 * v.vx() * g));
-        REQUIRE(bv.vy() == Approx(2 * v.vy() * g));
-        REQUIRE(bv.mag() == Approx(2 * v.mag() * g));
+        REQUIRE(bv.x == Approx(2 * v.x * g));
+        REQUIRE(bv.y == Approx(2 * v.y * g));
+        REQUIRE(bv.mag == Approx(2 * v.mag * g));
     }
 
     SECTION("boost")
@@ -71,15 +90,31 @@ TEST_CASE("vec")
     }
 }
 
-TEST_CASE("worldline")
+TEST_CASE("Integrator")
 {
-    SECTION("point")
+    SECTION("Rindler")
     {
-        // Frame mainframe;
-        // PointWorldline point(mainframe);
+        Frame mainframe;
 
-        // point.event_at_ptime(0.);
-        // point.vel_at_ptime(0.);
-        // point.mtime_step(1.0);
+        Body body(mainframe, vec3(1, 2, 3));
+
+        double dt = 0.001;
+        double x0 = randd();
+        double v = randd(-1, 1);
+        double a = randd();
+
+        Point point(mainframe, vec3(0, x0, 0));
+        point.vel = vel2(v, 0);
+        point.accel = vec2(a, 0);
+
+        Integrator integrator(mainframe);
+        integrator.addPoint(&point);
+        for (double t = 0; t < 10; t += dt)
+        {
+            double x = point.vel.gamma / (2 * a) * ((1 + v) * exp(a * t) + (1 - v) * exp(-a * t) - 2) + x0;
+            REQUIRE(point.t == Approx(t));
+            REQUIRE(point.x == Approx(x));
+            integrator.step(dt);
+        }
     }
 }

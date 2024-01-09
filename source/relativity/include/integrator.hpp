@@ -11,7 +11,7 @@ class Integrator
 {
     const Frame& mainframe;
 
-    std::vector<Point*> objects;
+    std::vector<Point*> points;
 
 public:
     Integrator(const Frame& mainframe);
@@ -19,4 +19,6 @@ public:
     void addPoint(Point* p);
 
     void step(const scalar dt);
+
+    std::vector<Point*> getPoints() { return points; }
 };

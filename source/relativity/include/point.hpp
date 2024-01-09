@@ -12,18 +12,13 @@
  *
  */
 
-class Point
+class Point : public vec3
 {
 public:
     /**
      * @brief Velocity in the mainframe.
      */
     vel2 vel;
-
-    /**
-     * @brief Current position and time in the mainframe.
-     */
-    vec3 current;
 
     /**
      * @brief Proper acceleration.
@@ -44,7 +39,7 @@ protected:
 public:
     Point(const Frame& mainframe);
 
-    Point(const Frame& mainframe, const vec3& current);
+    Point(const Frame& mainframe, const vec3& event);
 
     /**
      * @brief
@@ -53,6 +48,4 @@ public:
      * @return vec3
      */
     virtual void step(scalar dmt);
-
-    vec2 getPos() const;
 };

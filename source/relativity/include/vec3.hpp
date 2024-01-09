@@ -3,6 +3,8 @@
 #include "constants.hpp"
 #include "vec2.hpp"
 #include "vel2.hpp"
+#include <ostream>
+#include <iostream>
 
 /**
  * @brief spacetime vector of dimension 3
@@ -10,7 +12,7 @@
 struct vec3
 {
     /**
-     * @brief arbitrary spacetime coordinates
+     * @brief Cartesian spacetime coordinates
      */
     scalar t, x, y;
 
@@ -19,20 +21,22 @@ struct vec3
     vec3() : t(0), x(0), y(0) {}
     vec3(scalar t, scalar x, scalar y) : t(t), x(x), y(y) {}
 
+    inline vec2 pos() const { return vec2(x, y); }
+
     inline vec3& boost(const vel2& u)
     {
         scalar old_t = t;
 
         // parallel
-        scalar r_par = u._dir.x * x + u._dir.y * y;
+        scalar r_par = u.dir.x * x + u.dir.y * y;
 
         // perp
-        vec2 r_per(x - u._dir.x * r_par, y - u._dir.y * r_par);
+        vec2 r_per(x - u.dir.x * r_par, y - u.dir.y * r_par);
 
-        t = u.gamma() * (old_t + u.mag() * r_par);
-        scalar br_par = u.gamma() * (r_par + u.mag() * old_t);
+        t = u.gamma * (old_t + u.mag * r_par);
+        scalar br_par = u.gamma * (r_par + u.mag * old_t);
 
-        vec2 boosted = u._dir * br_par + r_per;
+        vec2 boosted = u.dir * br_par + r_per;
         x = boosted.x;
         y = boosted.y;
 
@@ -84,5 +88,10 @@ struct vec3
 
     // 2nd ground form
 
-    inline bool operator==(const vec3& u) const { return x == u.x && y == u.y; }
+    inline bool operator==(const vec3& u) const { return t == u.t && x == u.x && y == u.y; }
+
+    inline friend std::ostream& operator<<(std::ostream& os, const vec3& v)
+    {
+        return os << v.t << "," << v.x << "," << v.y;
+    }
 };
