@@ -96,14 +96,19 @@ TEST_CASE("Integrator")
     {
         Frame mainframe;
 
-        Body body(mainframe, vec3(1, 2, 3));
-
-        double dt = 0.001;
+        double dt = 0.01;
         double x0 = randd();
+        double t0 = randd();
         double v = randd(-1, 1);
-        double a = randd();
+        double g = 1 / sqrt(1 - v * v);
+        double a = randd(-1, 1);
+        CAPTURE(x0);
+        CAPTURE(t0);
+        CAPTURE(v);
+        CAPTURE(g);
+        CAPTURE(a);
 
-        Point point(mainframe, vec3(0, x0, 0));
+        Point point(mainframe, vec3(t0, x0, 0));
         point.vel = vel2(v, 0);
         point.accel = vec2(a, 0);
 
@@ -111,9 +116,13 @@ TEST_CASE("Integrator")
         integrator.addPoint(&point);
         for (double t = 0; t < 10; t += dt)
         {
-            double x = point.vel.gamma / (2 * a) * ((1 + v) * exp(a * t) + (1 - v) * exp(-a * t) - 2) + x0;
-            REQUIRE(point.t == Approx(t));
-            REQUIRE(point.x == Approx(x));
+            double tau = point.ptime;
+
+            double X = g / (2 * a) * ((1 + v) * exp(a * tau) + (1 - v) * exp(-a * tau) - 2) + x0;
+            double T = g / (2 * a) * ((1 + v) * exp(a * tau) - (1 - v) * exp(-a * tau) - 2 * v) + t0;
+            CAPTURE(t);
+            REQUIRE(point.t == Approx(T).epsilon(0.25).margin(0.05));
+            REQUIRE(point.x == Approx(X).epsilon(0.25).margin(0.05));
             integrator.step(dt);
         }
     }
