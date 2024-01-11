@@ -25,6 +25,25 @@ struct vec2
         return *this;
     }
 
+    inline vec2& normalise(scalar& mag)
+    {
+        mag = vec2::mag();
+        if (mag != 0) *this /= mag;
+        return *this;
+    }
+
+    inline vec2 normalised() const
+    {
+        vec2 n = *this;
+        return n.normalise();
+    }
+
+    inline vec2 normalised(scalar& mag)
+    {
+        vec2 n = *this;
+        return n.normalise(mag);
+    }
+
     inline vec2& operator+=(const vec2& u)
     {
         x += u.x;

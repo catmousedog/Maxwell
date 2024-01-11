@@ -38,6 +38,14 @@ public:
         return *this;
     }
 
+    inline vec2 contract(const vec2& pos) const
+    {
+        scalar l_par = pos * dir;
+        vec2 l_per = pos - l_par * dir;
+
+        return l_par * dir * igamma + l_per;
+    }
+
     /**
      * @brief Non-commutative relativistic velocity addition. The first velocity is the original
      * velocity in the 'rest' frame, the second velocity is the velocity of the boost.
@@ -62,22 +70,6 @@ public:
         vec2 bu_per = u_per * v.igamma * g;
 
         return *this = bu_par + bu_per;
-
-        // OLD IMPLEMENTATION SWITCH v and u
-        // vec2 bv_per;
-        // return *this = u._dir * bv_par + bv_per;
-
-        // vel2 &v = *this;
-        // // parallel
-        // scalar v_par = u._dir * v;
-        // scalar g = 1 / (1 + u._mag * v_par);
-        // scalar bv_par = (v_par + u._mag) * g;
-
-        // // perp
-        // vec2 v_per = static_cast<vec2 &>(v) - u._dir * v_par; // not a vel since we just need mag()
-        // vec2 bv_per = v_per * u._igamma * g;
-
-        // return *this = u._dir * bv_par + bv_per;
     }
 
     /**
@@ -103,7 +95,7 @@ private:
         igamma = sqrt(1 - mag2);
         gamma = 1 / igamma;
         dir = *this;
-        dir.normalise();
+        if (mag != 0) dir /= mag;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const vel2& vel)

@@ -52,8 +52,7 @@ PYBIND11_MODULE(relatpy, m)
         .def_readwrite("y", &vec3::y)
         .def_readwrite("ptime", &Point::ptime)
         .def_readwrite("vel", &Point::vel)
-        .def_readwrite("accel", &Point::accel)
-        .def("step", &Point::step);
+        .def_readwrite("accel", &Point::accel);
 
     py::class_<Body, Point>(m, "Body")
         .def(py::init<Frame, vec3>())
@@ -61,7 +60,6 @@ PYBIND11_MODULE(relatpy, m)
         .def_readwrite("x", &vec3::x)
         .def_readwrite("y", &vec3::y)
         .def("addPoint", &Body::addPoint)
-        .def("step", &Body::step)
         .def("getPoints", &Body::getPoints, py::return_value_policy::reference);
 
     py::class_<Integrator>(m, "Integrator")
