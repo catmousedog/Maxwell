@@ -1,11 +1,9 @@
 #pragma once
 
 #include "vec2.hpp"
-#include "ostream"
 
 struct vel2 : public vec2
 {
-public:
     using vec2::x;
     using vec2::y;
 
@@ -18,18 +16,14 @@ public:
 
     vel2() : vec2() { set(x, y); }
     vel2(scalar vx, scalar vy) : vec2(vx, vy) { set(x, y); }
-    vel2(const vec2& vec) : vec2(vec.x, vec.y) { set(x, y); }
+    vel2(const vel2& v) : vec2(v.x, v.y) { *this = v; }
 
-    inline vel2& operator=(const vel2& vel)
+    inline vec2 contract(const vec2& pos) const
     {
-        x = vel.x;
-        y = vel.y;
-        mag = vel.mag;
-        mag2 = vel.mag2;
-        igamma = vel.igamma;
-        gamma = vel.gamma;
-        dir = vel.dir;
-        return *this;
+        scalar l_par = pos * dir;
+        vec2 l_per = pos - l_par * dir;
+
+        return l_par * dir * igamma + l_per;
     }
 
     inline vel2& operator=(const vec2& vec)
@@ -38,12 +32,16 @@ public:
         return *this;
     }
 
-    inline vec2 contract(const vec2& pos) const
+    inline vel2& operator=(const vel2& v)
     {
-        scalar l_par = pos * dir;
-        vec2 l_per = pos - l_par * dir;
-
-        return l_par * dir * igamma + l_per;
+        x = v.x;
+        y = v.y;
+        mag = v.mag;
+        mag2 = v.mag2;
+        gamma = v.gamma;
+        igamma = v.igamma;
+        dir = v.dir;
+        return *this;
     }
 
     /**
@@ -55,34 +53,20 @@ public:
      */
     inline vel2& boost(const vel2& v)
     {
-        // we will boost this velocity by v
-        vel2& u = *this;
+        scalar u_par = v.dir * *this;
+        vec2 u_per = *this - u_par * v.dir;
 
-        scalar u_par_mag = v.dir * u;
-        scalar g = 1 / (1 + u_par_mag * v.mag);
-
-        // parallel
-        vec2 u_par = u_par_mag * v.dir;
-        vec2 bu_par = (v + u_par) * g;
-
-        // perpendicular
-        vec2 u_per = u - u_par;
+        scalar g = 1 / (1 + u_par * v.mag);
+        scalar bu_par = (v.mag + u_par) * g;
         vec2 bu_per = u_per * v.igamma * g;
 
-        return *this = bu_par + bu_per;
+        return *this = bu_par * v.dir + bu_per;
     }
 
-    /**
-     * @brief Relativistic velocity addition. The first velocity is the original velocity in the
-     * 'rest' frame, the second velocity is the velocity of the boost.
-     *
-     * @param u the boost velocity
-     * @return vel2
-     */
-    inline vel2 boosted(const vel2& u)
+    inline vel2 boosted(const vel2& v) const
     {
-        vel2 v = *this;
-        return v.boost(u);
+        vel2 u = *this;
+        return u.boost(v);
     }
 
 private:
@@ -97,12 +81,4 @@ private:
         dir = *this;
         if (mag != 0) dir /= mag;
     }
-
-    friend std::ostream& operator<<(std::ostream& os, const vel2& vel)
-    {
-        os << vel.x << ", " << vel.y;
-        return os;
-    }
-
-    friend class vec3;
 };

@@ -15,9 +15,9 @@ class Body : public Point
     std::vector<Point*> points;
 
     /**
-     * @brief Proper lengths associated with each point.
+     * @brief Proper positions associated with each point.
      */
-    std::vector<vec2> proper_positions;
+    std::vector<vec2> ppositions;
 
 public:
     using Point::Point;

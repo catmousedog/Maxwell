@@ -33,6 +33,8 @@
 
 # python
 __pycache__
+# no python scripts for now
+*.py
 
 # images
 *.png

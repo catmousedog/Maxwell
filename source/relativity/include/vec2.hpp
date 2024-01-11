@@ -2,7 +2,9 @@
 
 #include "constants.hpp"
 #include <math.h>
-#include <ostream>
+
+struct vec3;
+struct vel2;
 
 /**
  * @brief space vector for dimension 2
@@ -13,6 +15,7 @@ struct vec2
 
     vec2() : x(0), y(0) {}
     vec2(scalar x, scalar y) : x(x), y(y) {}
+    vec2(const vec2& v) = default;
 
     inline scalar mag() const { return sqrt(*this * *this); }
 
@@ -38,11 +41,13 @@ struct vec2
         return n.normalise();
     }
 
-    inline vec2 normalised(scalar& mag)
+    inline vec2 normalised(scalar& mag) const
     {
         vec2 n = *this;
         return n.normalise(mag);
     }
+
+    inline vec3 boosted(const vel2& v) const;
 
     inline vec2& operator+=(const vec2& u)
     {
@@ -65,7 +70,12 @@ struct vec2
         return *this;
     }
 
-    inline vec2& operator/=(const scalar a) { return *this *= (1 / a); }
+    inline vec2& operator/=(const scalar a)
+    {
+        x /= a;
+        y /= a;
+        return *this;
+    }
 
     inline vec2 operator+(const vec2& u) const
     {
@@ -91,17 +101,9 @@ struct vec2
         return u /= a;
     }
 
-    inline vec2 operator-() const { return *this * (-1); }
+    inline vec2 operator-() const { return vec2(-x, -y); }
 
-    /**
-   * @brief Inner product (+ +)
-   *
-   * @param u
-   * @return scalar
-   */
     inline scalar operator*(const vec2& u) const { return x * u.x + y * u.y; }
 
     inline friend vec2 operator*(const scalar a, const vec2& v) { return v * a; }
-
-    inline friend std::ostream& operator<<(std::ostream& os, const vec2& v) { return os << v.x << "," << v.y; }
 };
