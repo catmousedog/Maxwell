@@ -9,12 +9,12 @@
 
 class Integrator
 {
-    const Frame& mainframe;
+    const Frame& frame;
 
     std::vector<Point*> points;
 
 public:
-    Integrator(const Frame& mainframe);
+    Integrator(const Frame& frame);
 
     void addPoint(Point* p);
 

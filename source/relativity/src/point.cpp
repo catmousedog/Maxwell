@@ -26,6 +26,12 @@ void Point::setVelocity(scalar Ut, scalar Ux, scalar Uy)
     this->U = vel3(Ut, Ux, Uy);
 }
 
+void Point::boost(const vel2& v)
+{
+    pos.boost(v);
+    
+}
+
 void Point::setAccel(const vec2& alpha)
 {
     accel = alpha;

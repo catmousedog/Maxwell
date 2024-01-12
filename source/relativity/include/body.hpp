@@ -26,5 +26,10 @@ public:
 
     void step(scalar dmt) override;
 
-    std::vector<Point*> getPoints() { return points; }
+    std::vector<Point*> getPoints()
+    {
+        std::vector<Point*> allpoints = points;
+        allpoints.insert(allpoints.begin(), this);
+        return allpoints;
+    }
 };

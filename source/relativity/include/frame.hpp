@@ -1,10 +1,14 @@
 #pragma once
 
+#include "vec2.hpp"
+
 /**
  * @brief A (momentarily) inertial frame to use coordinates in.
  */
 struct Frame
 {
+    vec2 accel;
+
     // vec3 events[] // all events at t=0
 
     // somehow step the main frame forward and linearize the changes in events such that we don't have to ray march / implicit solve every frame

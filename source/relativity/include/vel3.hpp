@@ -14,8 +14,11 @@ struct vel3 : public vec3
     vel2 v;
 
     vel3() : vel3(1, 0, 0) {}
-    vel3(const vel2& v) : vel3(v.gamma, v.x * v.gamma, v.y * v.gamma) {}
+    vel3(const vec3& v) : vel3(v.t, v.x, v.y) {}
     vel3(scalar ut, scalar ux, scalar uy) : vec3(ut, ux, uy) { set(); }
+    vel3(const vel2& v) : vel3(v.gamma, v.x * v.gamma, v.y * v.gamma) {}
+
+    vel3 operator=(const vec3& v) = delete;
 
     using vec3::mag;
     using vec3::mag2;

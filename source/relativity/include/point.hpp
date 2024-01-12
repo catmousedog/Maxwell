@@ -39,5 +39,7 @@ public:
 
     void setVelocity(scalar Ut, scalar Ux, scalar Uy);
 
+    void boost(const vel2& v);
+
     void setAccel(const vec2& alpha);
 };

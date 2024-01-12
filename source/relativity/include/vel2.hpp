@@ -15,8 +15,11 @@ struct vel2 : public vec2
     vec2 dir;
 
     vel2() : vec2() { set(x, y); }
+    vel2(const vec2& v) : vel2(v.x, v.y) {}
     vel2(scalar vx, scalar vy) : vec2(vx, vy) { set(x, y); }
     vel2(const vel2& v) : vec2(v.x, v.y) { *this = v; }
+
+    vel2 operator=(const vec2& v) = delete;
 
     inline vec2 contract(const vec2& pos) const
     {
@@ -24,24 +27,6 @@ struct vel2 : public vec2
         vec2 l_per = pos - l_par * dir;
 
         return l_par * dir * igamma + l_per;
-    }
-
-    inline vel2& operator=(const vec2& vec)
-    {
-        set(vec.x, vec.y);
-        return *this;
-    }
-
-    inline vel2& operator=(const vel2& v)
-    {
-        x = v.x;
-        y = v.y;
-        mag = v.mag;
-        mag2 = v.mag2;
-        gamma = v.gamma;
-        igamma = v.igamma;
-        dir = v.dir;
-        return *this;
     }
 
     /**
@@ -60,7 +45,8 @@ struct vel2 : public vec2
         scalar bu_par = (v.mag + u_par) * g;
         vec2 bu_per = u_per * v.igamma * g;
 
-        return *this = bu_par * v.dir + bu_per;
+        *this = vel2(bu_par * v.dir + bu_per);
+        return *this;
     }
 
     inline vel2 boosted(const vel2& v) const
