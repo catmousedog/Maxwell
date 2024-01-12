@@ -9,6 +9,8 @@
 #include <iostream>
 #include <random>
 
+#define SQUARE(X) ((X) * (X))
+
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<scalar> uniform(0.0, 1.0);
@@ -87,13 +89,30 @@ TEST_CASE("vec")
     SECTION("boost") {}
 }
 
+scalar rindler_tau(scalar v, scalar g, scalar a, scalar T)
+{
+    return log((T * a + g * v + sqrt(SQUARE(T * a) + 2 * T * a * g * v + SQUARE(g))) / (g * (v + 1))) / a;
+}
+
+scalar rindler_x(scalar v, scalar g, scalar a, scalar tau, scalar x)
+{
+    return g / (2 * a) * ((1 + v) * exp(a * tau) + (1 - v) * exp(-a * tau) - 2) + x;
+}
+
+scalar rindler_t(scalar v, scalar g, scalar a, scalar tau)
+{
+    return g / (2 * a) * ((1 + v) * exp(a * tau) - (1 - v) * exp(-a * tau) - 2 * v);
+}
+
 TEST_CASE("Integrator")
 {
+
     SECTION("Rindler")
     {
         Frame frame;
 
-        scalar dt = 0.1;
+        scalar T = 10;
+        scalar dt = 0.01;
         // initial conditions //
         scalar x1 = 0;
         scalar v1 = 0.;
@@ -102,77 +121,72 @@ TEST_CASE("Integrator")
         CAPTURE(v1);
         CAPTURE(a1);
         ////////////////////////
+        scalar g1 = 1 / sqrt(1 - v1 * v1);
 
         Point point(vec3(0, x1, 0), vel2(v1, 0), vec2(a1, 0));
 
         Integrator integrator(frame);
         integrator.addPoint(&point);
-        for (scalar t = 0; t < 10; t += dt)
+        for (scalar t = 0; t < T; t += dt)
         {
-            scalar tau1 = point.pos.t;
+            scalar tau1 = rindler_tau(v1, g1, a1, t);
 
-            scalar X1 = 1 / (2 * a1) * ((1 + v1) * exp(a1 * tau1) + (1 - v1) * exp(-a1 * tau1) - 2) + x1;
-            scalar T1 = 1 / (2 * a1) * ((1 + v1) * exp(a1 * tau1) - (1 - v1) * exp(-a1 * tau1) - 2 * v1);
+            scalar X1 = rindler_x(v1, g1, a1, tau1, x1);
 
             CAPTURE(t);
-            CAPTURE(tau1);
-            // REQUIRE(point.t == Approx(T1).epsilon(0.01).margin(0.01));
-            // REQUIRE(point.x == Approx(X1).epsilon(0.01).margin(0.01));
+            REQUIRE(point.pos.t == Approx(t).epsilon(0.01).margin(0.01));
+            REQUIRE(point.pos.x == Approx(X1).epsilon(0.01).margin(0.01));
             integrator.step(dt);
         }
     }
 
     SECTION("Body")
     {
-        // Frame mainframe;
+        Frame mainframe;
 
-        // scalar dt = 0.01;
-        // // initial conditions //
-        // scalar x1 = 0;
-        // scalar v1 = -0.9;
-        // scalar g1 = 1 / sqrt(1 - v1 * v1);
-        // scalar a1 = 1;
-        // scalar d2 = 1;
-        // CAPTURE(x1);
-        // CAPTURE(v1);
-        // CAPTURE(g1);
-        // CAPTURE(a1);
-        // CAPTURE(d2);
-        // ////////////////////////
-        // scalar x2 = x1 + d2 / g1;
-        // scalar a2 = 1 / (1 / a1 + d2);
-        // scalar u2 = a2 / a1 * v1 * g1;
-        // scalar v2 = u2 / (1 + u2 * u2);
-        // CAPTURE(x2);
-        // CAPTURE(v2);
-        // CAPTURE(a2);
+        scalar T = 10;
+        scalar dt = 0.01;
+        // initial conditions //
+        scalar x1 = 0;
+        scalar v1 = -0.9;
+        scalar a1 = 1;
+        scalar d2 = 1;
+        CAPTURE(x1);
+        CAPTURE(v1);
+        CAPTURE(a1);
+        CAPTURE(d2);
+        ////////////////////////
+        scalar g1 = 1 / sqrt(1 - v1 * v1);
+        scalar x2 = x1 + d2 / g1;
+        scalar a2 = 1 / (1 / a1 + d2);
+        scalar u2 = v1 * g1 * a2 / a1;
+        scalar v2 = u2 / sqrt(1 + u2 * u2);
+        scalar g2 = 1 / sqrt(1 - v2 * v2);
 
-        // Body body(mainframe, vec3(0, x1, 0));
-        // body.accel = vec2(a1, 0);
-        // body.U = vel2(v1, 0);
-        // body.addPoint(vec2(d2, 0));
-        // Point& point = *body.getPoints()[0];
+        CAPTURE(x2);
+        CAPTURE(v2);
+        CAPTURE(a2);
 
-        // Integrator integrator(mainframe);
-        // integrator.addPoint(&body);
-        // for (scalar t = 0; t < 10; t += dt)
-        // {
-        //     scalar tau1 = body.ptime;
-        //     scalar tau2 = point.ptime;
+        Body body(vec3(0, x1, 0), vel2(v1, 0), vec2(a1, 0));
+        body.addPoint(vec2(d2, 0));
+        Point& point = *body.getPoints()[0];
 
-        //     scalar X1 = 1 / (2 * a1) * ((1 + v1) * exp(a1 * tau1) + (1 - v1) * exp(-a1 * tau1) - 2) + x1;
-        //     scalar T1 = 1 / (2 * a1) * ((1 + v1) * exp(a1 * tau1) - (1 - v1) * exp(-a1 * tau1) - 2 * v1);
-        //     scalar X2 = 1 / (2 * a2) * ((1 + v2) * exp(a2 * tau2) + (1 - v2) * exp(-a2 * tau2) - 2) + x2;
-        //     scalar T2 = 1 / (2 * a2) * ((1 + v2) * exp(a2 * tau2) - (1 - v2) * exp(-a2 * tau2) - 2 * v2);
+        Integrator integrator(mainframe);
+        integrator.addPoint(&body);
+        for (scalar t = 0; t < T; t += dt)
+        {
+            scalar tau1 = rindler_tau(v1, g1, a1, t);
+            scalar tau2 = rindler_tau(v2, g2, a2, t);
 
-        //     CAPTURE(t);
-        //     CAPTURE(tau1);
-        //     CAPTURE(tau2);
-        //     REQUIRE(body.t == Approx(T1).epsilon(0.01).margin(0.01));
-        //     REQUIRE(body.x == Approx(X1).epsilon(0.01).margin(0.01));
-        //     REQUIRE(point.t == Approx(T2).epsilon(0.01).margin(0.01));
-        //     REQUIRE(point.x == Approx(X2).epsilon(0.01).margin(0.01));
-        //     integrator.step(dt);
-        // }
+            scalar X1 = rindler_x(v1, g1, a1, tau1, x1);
+            scalar X2 = rindler_x(v2, g2, a2, tau2, x2);
+
+            CAPTURE(t);
+            REQUIRE(body.pos.t == Approx(t).epsilon(0.01).margin(0.01));
+            REQUIRE(body.pos.x == Approx(X1).epsilon(0.01).margin(0.01));
+            REQUIRE(point.pos.t == Approx(t).epsilon(0.01).margin(0.01));
+            REQUIRE(point.pos.x == Approx(X2).epsilon(0.01).margin(0.01));
+            integrator.step(dt);
+        }
     }
 }

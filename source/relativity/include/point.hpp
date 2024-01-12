@@ -13,12 +13,13 @@
 
 class Point
 {
-public:
-    vec3 pos;
-
+protected:
     vel3 U;
 
     vec3 A;
+
+public:
+    vec3 pos;
 
     vec2 accel;
 
@@ -33,4 +34,10 @@ public:
      * @return vec3
      */
     virtual void step(scalar dmt);
+
+    void setVelocity(const vel2& v);
+
+    void setVelocity(scalar Ut, scalar Ux, scalar Uy);
+
+    void setAccel(const vec2& alpha);
 };

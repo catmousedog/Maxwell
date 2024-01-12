@@ -79,8 +79,6 @@ PYBIND11_MODULE(relatpy, m)
     py::class_<Point>(m, "Point")
         .def(py::init<const vec3&, const vel2&, const vec2&>())
         .def_readwrite("pos", &Point::pos)
-        .def_readwrite("U", &Point::U)
-        .def_readwrite("A", &Point::A)
         .def_readwrite("accel", &Point::accel)
         .def_readwrite("ptime", &Point::ptime);
 

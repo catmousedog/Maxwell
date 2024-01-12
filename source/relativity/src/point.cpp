@@ -6,10 +6,27 @@ void Point::step(scalar dmt)
 {
     scalar dpt = dmt * U.v.igamma;
 
-    pos += U * dpt; // make this more accurate by splitting the addition U0 = gamma
-    A = accel.boosted(U.v);
-    U += A * dpt;
-    // U.normalise();
+    pos.t += dmt;
+    pos.x += U.v.x * dmt;
+    pos.y += U.v.y * dmt;
+    // pos += U * dpt;       // more compact but unnecessary gamma * and /
+    A = accel.boosted(U.v);  // boost the proper accel to the comoving frame
+    U += A * dpt;            // A = dU/dtau
 
     ptime += dpt;
+}
+
+void Point::setVelocity(const vel2& v)
+{
+    U = v;
+}
+
+void Point::setVelocity(scalar Ut, scalar Ux, scalar Uy)
+{
+    this->U = vel3(Ut, Ux, Uy);
+}
+
+void Point::setAccel(const vec2& alpha)
+{
+    accel = alpha;
 }
