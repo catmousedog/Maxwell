@@ -1,0 +1,8 @@
+
+TODO
+
+* RigidBody
+** determine accel
+*** problems with ppos, the object can rotate and I need a better way using mainframe pos to find acceleration (Rindler distance)
+** determine when to accel
+*** first pointer is the point which is furthest in opposite direction of current velocity, this seems to work correctly, only problem is we use ppos and the body can rotate so need to use mpos

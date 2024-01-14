@@ -9,16 +9,12 @@
  */
 struct vec3
 {
-    /**
-     * @brief Cartesian spacetime coordinates
-     */
     scalar t, x, y;
-
-    // perhaps some enum for cartesian, cylindrical, ...?
 
     vec3() : t(0), x(0), y(0) {}
     vec3(scalar t, scalar x, scalar y) : t(t), x(x), y(y) {}
     vec3(const vec3& v) = default;
+    vec3(const vec2& v) : t(0), x(v.x), y(v.y) {}
 
     inline vec2 getPos() const { return vec2(x, y); }
 
@@ -137,14 +133,11 @@ struct vec3
         return v /= a;
     }
 
-    // 1st ground form (metric)
-    /**
-     * @brief Minkowski inner product (+ - -)
-     *
-     * @param u
-     * @return scalar
-     */
     inline scalar operator*(const vec3& u) const { return t * u.t - x * u.x - y * u.y; }
+
+    inline friend vec3 operator*(const scalar a, const vec3& u) { return u * a; }
+
+    inline bool operator==(const vec3& u) const { return t == u.t && x == u.x && y == u.y; }
 };
 
 vec3 vec2::boosted(const vel2& v) const

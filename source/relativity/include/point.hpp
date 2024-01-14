@@ -1,9 +1,9 @@
 #pragma once
 
-// #include <deque>
-#include "frame.hpp"
+#include "body.hpp"
 #include "vec3.hpp"
-#include "vel3.hpp"
+
+class RigidBody;
 
 /**
  * Describe the local behaviour of an object. This needs to be able to predict spacetime points
@@ -11,15 +11,12 @@
  *
  */
 
-class Point
+class Point : public Body
 {
-protected:
-    vel3 U;
-
-    vec3 A;
-
 public:
     vec3 pos;
+
+    vel2 vel;
 
     vec2 accel;
 
@@ -33,13 +30,9 @@ public:
      * @param dmt main frame timestep
      * @return vec3
      */
-    virtual void step(scalar dmt);
+    virtual void step(scalar dmt) override;
 
-    void setVelocity(const vel2& v);
+    std::vector<Point*> getPoints() override;
 
-    void setVelocity(scalar Ut, scalar Ux, scalar Uy);
-
-    void boost(const vel2& v);
-
-    void setAccel(const vec2& alpha);
+    friend RigidBody;
 };

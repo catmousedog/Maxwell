@@ -1,18 +1,30 @@
 #include "../include/integrator.hpp"
+#include "../include/vel2.hpp"
 
-Integrator::Integrator(const Frame& frame) : frame(frame) {}
+Integrator::Integrator(Frame& frame) : frame(frame) {}
 
-void Integrator::addPoint(Point* p)
+void Integrator::addBody(Body* body)
 {
-    points.push_back(p);
+    bodies.push_back(body);
 }
 
-void Integrator::step(const scalar dt)
+void Integrator::setup()
+{
+    for (Body* body : bodies) body->setup();
+}
+
+void Integrator::step(scalar dt)
 {
     vel2 dv = vel2(frame.accel * (-dt));  // make dv opposite to perform Lorentz boost
-    for (Point* p : points)
+    for (Body* body : bodies)
     {
-        p->step(dt);
-        p->boost(dv);
+        body->step(dt);
+        // p->boost(dv);
     }
+    frame.time += dt;
+}
+
+std::vector<Body*> Integrator::getBodies()
+{
+    return bodies;
 }

@@ -4,9 +4,6 @@
 
 struct vel2 : public vec2
 {
-    using vec2::x;
-    using vec2::y;
-
     scalar mag;
     scalar mag2;
     scalar gamma;
@@ -14,12 +11,25 @@ struct vel2 : public vec2
 
     vec2 dir;
 
-    vel2() : vec2() { set(x, y); }
+    vel2() : vel2(0, 0) {}
+    vel2(scalar vx, scalar vy) : vec2(vx, vy)
+    {
+        mag2 = vec2::mag2();
+        mag = sqrt(mag2);
+        igamma = sqrt(1 - mag2);
+        gamma = 1 / igamma;
+        dir = *this;
+        if (mag != 0) dir /= mag;
+    }
+    vel2(const vel2& v) : vec2(v.x, v.y)
+    {
+        mag = v.mag;
+        mag2 = v.mag2;
+        gamma = v.gamma;
+        igamma = v.igamma;
+        dir = v.dir;
+    }
     vel2(const vec2& v) : vel2(v.x, v.y) {}
-    vel2(scalar vx, scalar vy) : vec2(vx, vy) { set(x, y); }
-    vel2(const vel2& v) : vec2(v.x, v.y) { *this = v; }
-
-    vel2 operator=(const vec2& v) = delete;
 
     inline vec2 contract(const vec2& pos) const
     {
@@ -53,18 +63,5 @@ struct vel2 : public vec2
     {
         vel2 u = *this;
         return u.boost(v);
-    }
-
-private:
-    inline void set(scalar vx, scalar vy)
-    {
-        x = vx;
-        y = vy;
-        mag = vec2::mag();
-        mag2 = vec2::mag2();
-        igamma = sqrt(1 - mag2);
-        gamma = 1 / igamma;
-        dir = *this;
-        if (mag != 0) dir /= mag;
     }
 };

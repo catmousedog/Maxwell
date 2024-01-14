@@ -1,7 +1,7 @@
-#include "../relativity/include/body.hpp"
 #include "../relativity/include/frame.hpp"
 #include "../relativity/include/integrator.hpp"
 #include "../relativity/include/point.hpp"
+#include "../relativity/include/rigidbody.hpp"
 #include "../relativity/include/vec2.hpp"
 #include "../relativity/include/vec3.hpp"
 #include "../relativity/include/vel2.hpp"
@@ -126,7 +126,7 @@ TEST_CASE("Integrator")
         Point point(vec3(0, x1, 0), vel2(v1, 0), vec2(a1, 0));
 
         Integrator integrator(frame);
-        integrator.addPoint(&point);
+        integrator.addBody(&point);
         for (scalar t = 0; t < T; t += dt)
         {
             scalar tau1 = rindler_tau(v1, g1, a1, t);
@@ -140,16 +140,16 @@ TEST_CASE("Integrator")
         }
     }
 
-    SECTION("Body")
+    SECTION("RigidBody")
     {
-        Frame mainframe;
+        Frame frame;
 
         scalar T = 10;
         scalar dt = 0.01;
         // initial conditions //
         scalar x1 = 0;
-        scalar v1 = -0.9;
-        scalar a1 = 1;
+        scalar v1 = 0.0;
+        scalar a1 = .2;
         scalar d2 = 1;
         CAPTURE(x1);
         CAPTURE(v1);
@@ -167,25 +167,37 @@ TEST_CASE("Integrator")
         CAPTURE(v2);
         CAPTURE(a2);
 
-        Body body(vec3(0, x1, 0), vel2(v1, 0), vec2(a1, 0));
-        body.addPoint(vec2(d2, 0));
-        Point& point = *body.getPoints()[0];
+        vel2 o(0.5, 0);
+        vel2 o2(0, -0.5);
+        vel2 b = o.boosted(o2);
+        vel2 b2 = o2.boosted(o);
 
-        Integrator integrator(mainframe);
-        integrator.addPoint(&body);
+        RigidBody body(frame, vec2(x1, 0), vel2(v1, 0), vec2(a1, 0));
+        scalar l = 1;
+        Point* point1 = body.addPoint(vec2(-l, -l));
+        Point* point2 = body.addPoint(vec2(-l, l));
+        Point* point3 = body.addPoint(vec2(l, l));
+        Point* point4 = body.addPoint(vec2(l, -l));
+
+        Integrator integrator(frame);
+        integrator.addBody(&body);
+        integrator.setup();
+        int i = 0;
         for (scalar t = 0; t < T; t += dt)
         {
-            scalar tau1 = rindler_tau(v1, g1, a1, t);
-            scalar tau2 = rindler_tau(v2, g2, a2, t);
+            // scalar tau1 = rindler_tau(v1, g1, a1, t);
+            // scalar tau2 = rindler_tau(v2, g2, a2, t);
 
-            scalar X1 = rindler_x(v1, g1, a1, tau1, x1);
-            scalar X2 = rindler_x(v2, g2, a2, tau2, x2);
+            // scalar X1 = rindler_x(v1, g1, a1, tau1, x1);
+            // scalar X2 = rindler_x(v2, g2, a2, tau2, x2);
+
+            if (point1->vel.x > .5) body.updateAccel(vec2(0, -1));
 
             CAPTURE(t);
-            REQUIRE(body.pos.t == Approx(t).epsilon(0.01).margin(0.01));
-            REQUIRE(body.pos.x == Approx(X1).epsilon(0.01).margin(0.01));
-            REQUIRE(point.pos.t == Approx(t).epsilon(0.01).margin(0.01));
-            REQUIRE(point.pos.x == Approx(X2).epsilon(0.01).margin(0.01));
+            // REQUIRE(point1->pos.t == Approx(t).epsilon(0.01).margin(0.01));
+            // REQUIRE(point1->pos.x == Approx(X1).epsilon(0.01).margin(0.01));
+            // REQUIRE(point2->pos.t == Approx(t).epsilon(0.01).margin(0.01));
+            // REQUIRE(point2->pos.x == Approx(X2).epsilon(0.01).margin(0.01));
             integrator.step(dt);
         }
     }

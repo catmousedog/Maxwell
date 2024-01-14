@@ -1,7 +1,8 @@
 import pygame
 import sys
-from pygame.locals import K_w, KMOD_CTRL
-from relatpy import vec3, vel2, vec2, Body, Integrator, Frame
+from pygame.locals import *
+from relatpy import vec3, vel2, vec2, RigidBody, Integrator, Frame
+from math import *
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
@@ -23,23 +24,39 @@ def convert_to_pixels(coord):
     return x_pixel, y_pixel
 
 
-initial_pos = vec3(0, -5, -5)
-initial_vel = vel2(0, 0)
-initial_accel = vec2(1.5, 1.5)
+initial_pos = vec2(-9, 9)
+initial_vel = vel2(0, 0.)
+initial_accel = vec2(.9, 0)
 
-body = Body(initial_pos, initial_vel, initial_accel)
-l = 4
-body.addPoint(vec2(l, 0))
-body.addPoint(vec2(l, l))
-body.addPoint(vec2(0, l))
-
-points = body.getPoints()
+frame = Frame()
+rigidbody = RigidBody(frame, initial_pos, initial_vel, initial_accel)
+l = 5
+N = 10
+points = []
+for i in range(N):
+    points.append(rigidbody.addPoint(vec2(l*i/N, 0)))
 
 
 clock = pygame.time.Clock()
 
-integrator = Integrator(Frame())
-integrator.addPoint(body)
+integrator = Integrator(frame)
+integrator.addBody(rigidbody)
+integrator.setup()
+bodies = integrator.getBodies()
+
+pressed_keys = set()
+i = 0
+prev_accel = initial_accel
+bool1 = True
+bool2 = True
+bool3 = True
+bool4 = True
+
+# for some reason this fixes error???
+ttt = integrator.getBodies()[0].getPoints()
+
+def Approx(num1, num2, tolerance=1e-2):
+    return abs(num1 - num2) < tolerance
 
 while True:
     for event in pygame.event.get():
@@ -50,16 +67,36 @@ while True:
             if event.key == K_w and pygame.key.get_mods() & KMOD_CTRL:
                 pygame.quit()
                 sys.exit()
+            else:
+                pressed_keys.add(event.key)
+        elif event.type == pygame.KEYUP:
+            pressed_keys.discard(event.key)
 
-    integrator.step(TPS / FPS)
+    accel = vec2(0, 0)
+    accel.x = .4 * ((K_RIGHT in pressed_keys) - (K_LEFT in pressed_keys))
+    accel.y = .4 * ((K_UP in pressed_keys) - (K_DOWN in pressed_keys))
+    if accel.x != prev_accel.x or accel.y != prev_accel.y:
+        if rigidbody.updateAccel(accel):
+            prev_accel = accel
+            print(f"YES: {accel.x}, {accel.y}")
+        else:
+            print(f"NO: {accel.x}, {accel.y}")
+
+    for _ in range(10):
+        integrator.step(TPS / FPS / 10.)
 
     screen.fill(BLACK)
 
+    points = []
+    for body in integrator.getBodies():
+        points.extend(body.getPoints())
+
     pixel_positions = [convert_to_pixels(point.pos) for point in points]
     for pixels in pixel_positions:
-        pygame.draw.circle(screen, WHITE, pixels, 4)
-    pygame.draw.polygon(screen, WHITE, pixel_positions, 1)
+        pygame.draw.circle(screen, WHITE, pixels, 2)
+    pygame.draw.lines(screen, WHITE, False, pixel_positions, 1)
 
     pygame.display.flip()
 
     clock.tick(FPS)
+    i += 1

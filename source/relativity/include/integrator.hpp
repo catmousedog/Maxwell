@@ -1,24 +1,24 @@
 #pragma once
 
-#include "point.hpp"
-#include "vec2.hpp"
-#include "vec3.hpp"
-#include "vel2.hpp"
+#include "body.hpp"
+#include "frame.hpp"
 #include <memory>
 #include <vector>
 
 class Integrator
 {
-    const Frame& frame;
+    Frame& frame;
 
-    std::vector<Point*> points;
+    std::vector<Body*> bodies;
 
 public:
-    Integrator(const Frame& frame);
+    Integrator(Frame& frame);
 
-    void addPoint(Point* p);
+    void addBody(Body* body);
 
-    void step(const scalar dt);
+    void setup();
 
-    std::vector<Point*> getPoints() { return points; }
+    void step(scalar dmt);
+
+    std::vector<Body*> getBodies();
 };

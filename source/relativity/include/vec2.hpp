@@ -7,7 +7,7 @@ struct vec3;
 struct vel2;
 
 /**
- * @brief space vector for dimension 2
+ * @brief space vector of dimension 2
  */
 struct vec2
 {
@@ -101,9 +101,9 @@ struct vec2
         return u /= a;
     }
 
-    inline vec2 operator-() const { return vec2(-x, -y); }
-
     inline scalar operator*(const vec2& u) const { return x * u.x + y * u.y; }
 
-    inline friend vec2 operator*(const scalar a, const vec2& v) { return v * a; }
+    inline friend vec2 operator*(const scalar a, const vec2& u) { return u * a; }
+
+    inline bool operator==(const vec2& u) const { return x == u.x && y == u.y; }
 };

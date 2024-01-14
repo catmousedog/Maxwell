@@ -7,7 +7,16 @@
  */
 struct Frame
 {
+    /**
+     * @brief Proper acceleration of this comoving frame.
+     * 
+     */
     vec2 accel;
+
+    /**
+     * @brief Current frame proper time.
+     */
+    scalar time = 0.;
 
     // vec3 events[] // all events at t=0
 

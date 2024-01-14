@@ -1,35 +1,18 @@
 #pragma once
 
-#include "point.hpp"
-#include <iostream>
+#include "constants.hpp"
 #include <vector>
 
-/**
- * @brief A rigid body. Although technically not possible since it would break
- * causality, the worldlines of this body move in such a way it remains the same
- * proper lengths.
- */
-class Body : public Point
+struct Point;
+
+class Body
 {
-
-    std::vector<Point*> points;
-
-    /**
-     * @brief Proper positions associated with each point.
-     */
-    std::vector<vec2> ppositions;
-
 public:
-    using Point::Point;
+    virtual ~Body() = default;
 
-    void addPoint(const vec2& ppos);
+    virtual void setup() {}
 
-    void step(scalar dmt) override;
+    virtual void step(scalar dmt) = 0;
 
-    std::vector<Point*> getPoints()
-    {
-        std::vector<Point*> allpoints = points;
-        allpoints.insert(allpoints.begin(), this);
-        return allpoints;
-    }
+    virtual std::vector<Point*> getPoints() = 0;
 };
